@@ -1,0 +1,6 @@
+bastion
+libssh/
+ssh_host_*_key
+test_client.c
+*.[do]
+*.sw[a-p]
