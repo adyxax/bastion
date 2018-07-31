@@ -17,7 +17,7 @@ static void sigchld_handler(int signo) {
 static ssh_bind sshbind;
 static ssh_session session;
 
-__attribute__((noreturn)) void sigint_handler(int signo)
+__attribute__((noreturn)) static void sigint_handler(int signo)
 {
     (void) signo;
     ssh_free(session);
@@ -56,8 +56,8 @@ int main()
         fprintf(stderr, "Error initializing ssh_bind\n");
         exit(-1);
     }
-    int port = 2222;
-    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT, &port);
+    int listen_port = LISTEN_PORT;
+    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT, &listen_port);
     ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_DSAKEY, DSAKEY_PATH);
     ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_RSAKEY, RSAKEY_PATH);
     ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_ECDSAKEY, ECDSAKEY_PATH);

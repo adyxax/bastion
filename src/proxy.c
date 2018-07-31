@@ -30,14 +30,15 @@ static int proxy_pty_request(ssh_session session, ssh_channel channel,
     (void) py;
     (void) px;
 
-    printf("pty request\n");
-    int rc = ssh_channel_request_pty_size(pdata->client_channel, term, cols, rows);
-    if (rc == SSH_OK) {
-        printf("pty request successfull\n");
+    if (ssh_channel_is_open(pdata->client_channel)) {
+        if (ssh_channel_request_pty_size(pdata->client_channel, term, cols, rows) == SSH_OK)
+            return SSH_OK;
+        else
+            fprintf(stderr, "pty request failed\n");
     } else {
-        printf("pty request failed\n");
+        fprintf(stderr, "pty request while client_channel not opened\n");
     }
-    return rc;
+    return SSH_ERROR;
 }
 
 // callback function for SSH channel PTY resize from a client
@@ -50,18 +51,15 @@ static int proxy_pty_resize(ssh_session session, ssh_channel channel, int cols,
     (void) py;
     (void) px;
 
-    if (pdata->client_channel == NULL || ssh_channel_is_open(pdata->client_channel) == 0) {
-        fprintf(stderr, "proxy pty oups!!!!!\n");
-        return SSH_ERROR;
-    }
-    printf("pty resize\n");
-    int rc = ssh_channel_change_pty_size(pdata->client_channel, cols, rows);
-    if (rc == SSH_OK) {
-        printf("pty resize successfull\n");
+    if (ssh_channel_is_open(pdata->client_channel)) {
+        if (ssh_channel_change_pty_size(pdata->client_channel, cols, rows) == SSH_OK)
+            return SSH_OK;
+        else
+            fprintf(stderr, "pty resize failed\n");
     } else {
-        printf("pty resize failed\n");
+        fprintf(stderr, "pty resize while client_channel not opened\n");
     }
-    return rc;
+    return SSH_ERROR;
 }
 
 static int proxy_exec_request(ssh_session session, ssh_channel channel,
@@ -71,14 +69,15 @@ static int proxy_exec_request(ssh_session session, ssh_channel channel,
     (void) session;
     (void) channel;
 
-    printf("exec request : %s\n", command); // TODO
-    int rc = ssh_channel_request_exec(pdata->client_channel, command);
-    if (rc == SSH_OK) {
-        printf("exec request successfull\n");
+    if (ssh_channel_is_open(pdata->client_channel)) {
+        if (ssh_channel_request_exec(pdata->client_channel, command) == SSH_OK)
+            return SSH_OK;
+        else
+            printf("exec request failed\n");
     } else {
-        printf("exec request failed\n");
+        fprintf(stderr, "exec request while client_channel not opened\n");
     }
-    return rc;
+    return SSH_ERROR;
 }
 
 static int proxy_shell_request(ssh_session session, ssh_channel channel,
@@ -88,44 +87,44 @@ static int proxy_shell_request(ssh_session session, ssh_channel channel,
     (void) session;
     (void) channel;
 
-    printf("shell request\n");
-    int rc = ssh_channel_request_shell(pdata->client_channel);
-    if (rc == SSH_OK) {
-        printf("shell request successfull\n");
+    if (ssh_channel_is_open(pdata->client_channel)) {
+        if (ssh_channel_request_shell(pdata->client_channel) == SSH_OK)
+            return SSH_OK;
+        else
+            fprintf(stderr, "shell request failed\n");
     } else {
-        printf("shell request failed\n");
+        fprintf(stderr, "shell request while client channel not opened\n");
     }
-    return rc;
+    return SSH_ERROR;
 }
 
 static int proxy_subsystem_request(ssh_session session, ssh_channel channel,
                              const char *subsystem, void *userdata) {
-    ///* subsystem requests behave simillarly to exec requests. */
-    //if (strcmp(subsystem, "sftp") == 0) {
-    //    printf("sftp request\n"); // TODO
-    //    return exec_request(session, channel, SFTP_SERVER_PATH, userdata);
-    //}
     (void) session;
     (void) channel;
     (void) subsystem;
     (void) userdata;
     return SSH_ERROR; // TODO
+    //if (ssh_channel_is_open(pdata->client_channel)) {
+    //}
 }
 
 static void proxy_channel_eof_callback (ssh_session session, ssh_channel channel, void *userdata)
 {
+    struct proxy_channel_data_struct *pdata = (struct proxy_channel_data_struct *) userdata;
     (void) session;
     (void) channel;
-    (void) userdata;
-    printf("proxy eof callback\n");
+    if (ssh_channel_is_open(pdata->client_channel))
+        ssh_channel_send_eof(pdata->client_channel);
 }
 
 static void proxy_channel_close_callback (ssh_session session, ssh_channel channel, void *userdata)
 {
+    struct proxy_channel_data_struct *pdata = (struct proxy_channel_data_struct *) userdata;
     (void) session;
     (void) channel;
-    (void) userdata;
-    printf("proxy close callback\n");
+    if (ssh_channel_is_open(pdata->client_channel))
+        ssh_channel_close(pdata->client_channel);
 }
 
 static void proxy_channel_exit_status_callback (ssh_session session, ssh_channel channel, int exit_status, void *userdata)
@@ -170,12 +169,7 @@ void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_c
         .client_channel = NULL,
     };
 
-    //ssh_event_remove_session(event, session);
     cdata = client_dial(event, &pdata, hostname);
-    //for (int n = 0; n < 10; n++) {
-    //    ssh_event_dopoll(event, 100);
-    //}
-    //ssh_event_add_session(event, session);
 
     if (cdata == NULL) {
         return;

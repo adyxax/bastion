@@ -1,6 +1,6 @@
 CC=clang
 DEBUG=-g
-CFLAGS= ${DEBUG} -Wall -Werror -Wextra -Weverything -Wno-missing-prototypes -Wno-disabled-macro-expansion
+CFLAGS= ${DEBUG} -Wall -Werror -Wextra -Weverything -Wno-disabled-macro-expansion
 
 sources=$(wildcard src/*.c)
 OBJ=$(sources:.c=.o)

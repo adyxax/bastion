@@ -12,7 +12,7 @@
 #include "proxy.h"
 #include "session.h"
 
-int auth_pubkey(ssh_session session, const char *user,
+static int auth_pubkey(ssh_session session, const char *user,
                        struct ssh_key_struct *pubkey,
                        char signature_state, void *userdata) {
     struct session_data_struct *sdata = (struct session_data_struct *) userdata;
@@ -51,7 +51,7 @@ int auth_pubkey(ssh_session session, const char *user,
     }
 }
 
-ssh_channel channel_open(ssh_session session, void *userdata) {
+static ssh_channel channel_open(ssh_session session, void *userdata) {
     struct session_data_struct *sdata = (struct session_data_struct *) userdata;
 
     if (sdata->channel == NULL) {
