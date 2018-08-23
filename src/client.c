@@ -139,6 +139,7 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     }
 
     cdata->client_channel_cb = malloc(sizeof(*cdata->client_channel_cb));
+    memset(cdata->client_channel_cb, 0, sizeof(*cdata->client_channel_cb));
     cdata->client_channel_cb->userdata = cdata;
     cdata->client_channel_cb->channel_data_function = client_data_function;
     cdata->client_channel_cb->channel_eof_function = client_channel_eof_callback;
@@ -160,7 +161,7 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
 channel_clean:
     ssh_channel_free(cdata->my_channel);
 auth_clean:
-    // TODO
+    // TODO when pubkey match implemented fix this
 //pubkey_nomatch_clean:
     ssh_string_free_char(hexa);
 pubkey_hash_clean:

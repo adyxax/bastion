@@ -30,7 +30,7 @@ static int auth_pubkey(ssh_session session, const char *user,
 
     // TODO check for an invite
 
-    ssh_key reference_key = ssh_key_new();
+    ssh_key reference_key;
     ssh_pki_import_pubkey_base64(USER_RSA_PUBKEY, SSH_KEYTYPE_RSA, &reference_key); // TODO fetch all pubkeys from db
     if (!ssh_key_cmp(pubkey, reference_key, SSH_KEY_CMP_PUBLIC)) {
         sdata->authenticated = 1;
@@ -41,8 +41,7 @@ static int auth_pubkey(ssh_session session, const char *user,
             return SSH_ERROR;
         }
         sdata->login_username = malloc(len+1);
-        memset(sdata->login_username, 0, len+1);
-        strncpy(sdata->login_username, user, len);
+        strncpy(sdata->login_username, user, len+1);
         return SSH_AUTH_SUCCESS;
     } else {
         ssh_key_free(reference_key);

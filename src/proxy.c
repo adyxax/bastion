@@ -104,7 +104,7 @@ static int proxy_subsystem_request(ssh_session session, ssh_channel channel,
     (void) channel;
     (void) subsystem;
     (void) userdata;
-    return SSH_ERROR; // TODO
+    return SSH_ERROR; // TODO ssh subsystem request
     //if (ssh_channel_is_open(pdata->client_channel)) {
     //}
 }
@@ -190,21 +190,10 @@ void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_c
         .channel_pty_window_change_function = proxy_pty_resize,
         .channel_exec_request_function = proxy_exec_request,
         .channel_subsystem_request_function = proxy_subsystem_request,
-  /** This function will be called when a client requests agent
-   * authentication forwarding.
-   */
-  //ssh_channel_auth_agent_req_callback channel_auth_agent_req_function;
-  /** This function will be called when a client requests X11
-   * forwarding.
-   */
-  //ssh_channel_x11_req_callback channel_x11_req_function;
-  /** This function will be called when a client requests an environment
-   * variable to be set.
-   */
-  /** This function will be called when the channel write is guaranteed
-   * not to block.
-   */
-  //    .channel_write_wontblock_function = proxy_channel_write_wontblock,
+        .channel_auth_agent_req_function = NULL,
+        .channel_x11_req_function = NULL,
+        .channel_env_request_function = NULL,
+        .channel_write_wontblock_function = NULL,
     };
     ssh_callbacks_init(&channel_cb);
     ssh_set_channel_callbacks(my_channel, &channel_cb);
