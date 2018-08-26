@@ -9,13 +9,13 @@
 #include <sys/wait.h>
 
 #include "../config.h"
+#include "mysql.h"
 #include "proxy.h"
 #include "session.h"
 #include "state.h"
 
-static int auth_pubkey(ssh_session session, const char *user,
-                       struct ssh_key_struct *pubkey,
-                       char signature_state, void *userdata) {
+static int auth_pubkey(ssh_session session, const char *user, ssh_key pubkey, char signature_state,
+                       void *userdata) {
     struct session_data_struct *sdata = (struct session_data_struct *) userdata;
     (void) session;
 
@@ -31,20 +31,19 @@ static int auth_pubkey(ssh_session session, const char *user,
 
     // TODO check for an invite
 
-    ssh_key reference_key;
-    ssh_pki_import_pubkey_base64(USER_RSA_PUBKEY, SSH_KEYTYPE_RSA, &reference_key); // TODO fetch all pubkeys from db
-    if (!ssh_key_cmp(pubkey, reference_key, SSH_KEY_CMP_PUBLIC)) {
+    char * bastion_username = db_get_username_from_pubkey(pubkey);
+    if (bastion_username != NULL) {
         sdata->authenticated = 1;
-        ssh_key_free(reference_key);
         if (state_set_ssh_destination(user) != 0)
             return SSH_ERROR;
         // TODO check access rights and host configs
-        state_set_username(USER_TO_LOGIN_AS);
+        state_set_bastion_username(bastion_username);
+        free(bastion_username);
         // TODO log session creation in db
         state_set_session_id(1337);
         return SSH_AUTH_SUCCESS;
     } else {
-        ssh_key_free(reference_key);
+        free(bastion_username);
         sdata->auth_attempts++;
         return SSH_AUTH_DENIED;
     }

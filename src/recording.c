@@ -23,7 +23,7 @@ void clean_recorder(void)
     recorder_handle = NULL;
 }
 
-static char * // this char * is to be freed from the calling code
+static char * // returns NULL if error, this char * is to be freed from the calling code
 make_filename(void)
 {
     char * format = LOG_FILENAME_FORMAT;
@@ -49,7 +49,7 @@ make_filename(void)
                 strcpy(filename + fname_pos, hostname);
                 fname_pos += len;
             } else if (format[format_pos] == 'u') {
-                const char * username = state_get_username();
+                const char * username = state_get_bastion_username();
                 size_t len = strlen(username);
                 strcpy(filename + fname_pos, username);
                 fname_pos += len;

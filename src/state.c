@@ -7,9 +7,9 @@
 
 struct state {
     char * destination;
-    char * username;
+    char * bastion_username;
     int session_id;
-    int padding;
+    int padding; // makes compiler happy
 };
 
 static struct state state = {0};
@@ -37,10 +37,10 @@ const char * state_get_ssh_destination(void)
 }
 
 char // return 0 if ok, greater than 0 otherwise
-state_set_username(const char * name)
+state_set_bastion_username(const char * name)
 {
-    if (state.username != NULL) {
-        fprintf(stderr, "BUG found, attempting to overwrite state.username that has already been set\n");
+    if (state.bastion_username != NULL) {
+        fprintf(stderr, "BUG found, attempting to overwrite state.bastion_username that has already been set\n");
         return 1;
     }
     size_t len = strnlen(name, MAX_USERNAME_LENGTH + 1);
@@ -48,14 +48,14 @@ state_set_username(const char * name)
         fprintf(stderr, "Username too long, max length is %d.\n", MAX_USERNAME_LENGTH);
         return 1;
     }
-    state.username = malloc(len+1);
-    strncpy(state.username, name, len+1);
+    state.bastion_username = malloc(len+1);
+    strncpy(state.bastion_username, name, len+1);
     return 0;
 }
 
-const char * state_get_username(void)
+const char * state_get_bastion_username(void)
 {
-    return state.username;
+    return state.bastion_username;
 }
 
 char // return 0 if ok, greater than 0 otherwise
@@ -78,6 +78,4 @@ void state_clean(void)
 {
     free(state.destination);
     state.destination = NULL;
-    free(state.username);
-    state.username = NULL;
 }

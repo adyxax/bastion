@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 
 #include "../config.h"
+#include "mysql.h"
 #include "session.h"
 
 /* SIGCHLD handler for cleaning up dead children. */
@@ -24,6 +25,7 @@ __attribute__((noreturn)) static void sigint_handler(int signo)
     ssh_free(session);
     ssh_bind_free(sshbind);
     ssh_finalize();
+    db_clean();
     exit(0);
 }
 
@@ -92,6 +94,9 @@ int main()
                 ssh_bind_free(sshbind);
                 sshbind = NULL;
 
+                if (db_init() !=0)
+                    goto child_cleaning;
+
                 ssh_event event = ssh_event_new();
                 if (event != NULL) {
                     /* Blocks until the SSH session ends */
@@ -100,6 +105,7 @@ int main()
                 } else {
                     fprintf(stderr, "Could not create polling context\n");
                 }
+child_cleaning:
                 ssh_disconnect(session);
                 ssh_free(session);
                 ssh_finalize();
@@ -122,5 +128,6 @@ int main()
     }
     ssh_bind_free(sshbind);
     ssh_finalize();
+    db_clean();
     return 0;
 }

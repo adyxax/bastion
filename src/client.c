@@ -7,6 +7,7 @@
 #ifdef SESSION_RECORDING
 #include "recording.h"
 #endif
+#include "mysql.h"
 #include "state.h"
 
 // callback function for channel data and exceptions
@@ -87,8 +88,12 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     cdata->client_channel_cb = NULL;
 
     /* First we try to add the private key that the server will accept */
-    ssh_key privkey;
-    if (ssh_pki_import_privkey_file(PRIVKEY_PATH, NULL, NULL, NULL, &privkey) != SSH_OK) {
+    struct db_host_info * info = db_get_host_info(hostname);
+    if (info == NULL)
+        goto host_info_clean;
+
+    ssh_key privkey = NULL;
+    if (ssh_pki_import_privkey_base64(info->privkeytxt, NULL, NULL, NULL, &privkey) != SSH_OK) {
         printf("Error importing private key");
         goto privkey_clean;
     }
@@ -97,8 +102,8 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     printf("Connecting to %s\n", hostname);
     cdata->my_session = ssh_new();
 
-    ssh_options_set(cdata->my_session, SSH_OPTIONS_HOST, hostname);
-    ssh_options_set(cdata->my_session, SSH_OPTIONS_USER, state_get_username());
+    ssh_options_set(cdata->my_session, SSH_OPTIONS_HOST, info->address);
+    ssh_options_set(cdata->my_session, SSH_OPTIONS_USER, info->username);
 #ifdef LIBSSH_VERBOSE_OUTPOUT
     int verbosity = SSH_LOG_PROTOCOL;
     ssh_options_set(cdata->my_session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
@@ -110,7 +115,7 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     }
 
     /* We now validate the remote server's public key */
-    ssh_key server_pub_key;
+    ssh_key server_pub_key = NULL;
     unsigned char * hash = NULL;
     size_t hlen;
     char * hexa = NULL;
@@ -123,15 +128,26 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
         goto pubkey_hash_clean;
     }
     hexa = ssh_get_hexa(hash, hlen);
-    printf("Server public key hash : %s\n", hexa); // TODO validate the key
-    // if error goto pubkey_nomatch_clean
+    if (strlen(info->hostkeyhash) > 0) {
+        if (strcmp(hexa, info->hostkeyhash) != 0) {
+            fprintf(stderr, "Error invalid host key for %s\n", hostname);
+            goto pubkey_hexa_clean;
+        }
+    } else {
+        // TODO we got a broken sshportal record, we need to fix it but only
+        // after we completed the migration from sshportal
+        //db_set_host_publickey_hash(hostname, hexa);
+    }
+    ssh_string_free_char(hexa);
+    ssh_clean_pubkey_hash(&hash);
+    ssh_key_free(server_pub_key);
 
     /* With the server checked, we can authenticate */
     if(ssh_userauth_publickey(cdata->my_session, NULL, privkey) == SSH_AUTH_SUCCESS){
         printf("Authentication success\n");
     } else {
         printf("Error private key was rejected\n");
-        goto auth_clean;
+        goto session_clean;
     }
 
     /* we open the client channel */
@@ -170,17 +186,14 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     }
 #endif
 
-    ssh_string_free_char(hexa);
-    ssh_clean_pubkey_hash(&hash);
-    ssh_key_free(server_pub_key);
     ssh_key_free(privkey);
+    db_free_host_info(info);
     return cdata;
 
 channel_clean:
     ssh_channel_free(cdata->my_channel);
-auth_clean:
-    // TODO when pubkey match implemented fix this
-//pubkey_nomatch_clean:
+    goto session_clean;
+pubkey_hexa_clean:
     ssh_string_free_char(hexa);
 pubkey_hash_clean:
     ssh_clean_pubkey_hash(&hash);
@@ -189,8 +202,10 @@ pubkey_clean:
 session_clean:
     ssh_disconnect(cdata->my_session);
     ssh_free(cdata->my_session);
+    db_free_host_info(info);
 privkey_clean:
     ssh_key_free(privkey);
+host_info_clean:
     free(cdata);
     return NULL;
 }

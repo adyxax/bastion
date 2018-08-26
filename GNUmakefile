@@ -8,7 +8,7 @@ OBJ=$(sources:.c=.o)
 all: bastion
 
 bastion: $(OBJ)
-	$(CC) ${DEBUG} -o bastion $(OBJ) -lssh -lutil -ltty
+	$(CC) ${DEBUG} -o bastion $(OBJ) -lssh -lutil -ltty -lmysqlclient
 
 clean:
 	$(RM) bastion *.[do] src/*.[do]
