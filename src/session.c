@@ -11,6 +11,7 @@
 #include "../config.h"
 #include "proxy.h"
 #include "session.h"
+#include "state.h"
 
 static int auth_pubkey(ssh_session session, const char *user,
                        struct ssh_key_struct *pubkey,
@@ -35,13 +36,12 @@ static int auth_pubkey(ssh_session session, const char *user,
     if (!ssh_key_cmp(pubkey, reference_key, SSH_KEY_CMP_PUBLIC)) {
         sdata->authenticated = 1;
         ssh_key_free(reference_key);
-        size_t len = strnlen(user, MAX_HOSTNAME_LENGTH + 1);
-        if (len == MAX_HOSTNAME_LENGTH + 1) {
-            fprintf(stderr, "Hostname too long, max length is %d.\n", MAX_HOSTNAME_LENGTH);
+        if (state_set_ssh_destination(user) != 0)
             return SSH_ERROR;
-        }
-        sdata->login_username = malloc(len+1);
-        strncpy(sdata->login_username, user, len+1);
+        // TODO check access rights and host configs
+        state_set_username(USER_TO_LOGIN_AS);
+        // TODO log session creation in db
+        state_set_session_id(1337);
         return SSH_AUTH_SUCCESS;
     } else {
         ssh_key_free(reference_key);
@@ -68,7 +68,6 @@ void handle_session(ssh_event event, ssh_session session) {
         .channel = NULL,
         .auth_attempts = 0,
         .authenticated = 0,
-        .login_username = NULL
     };
 
     struct ssh_server_callbacks_struct server_cb = {
@@ -105,7 +104,7 @@ void handle_session(ssh_event event, ssh_session session) {
         }
     }
 
-    handle_proxy_session(event, session, sdata.channel, sdata.login_username);
+    handle_proxy_session(event, session, sdata.channel);
 
     if (ssh_channel_is_open(sdata.channel)) {
         ssh_channel_close(sdata.channel);
@@ -115,6 +114,6 @@ void handle_session(ssh_event event, ssh_session session) {
     for (int n = 0; n < 50 && (ssh_get_status(session) & SESSION_END) == 0; n++) {
         ssh_event_dopoll(event, 100);
     }
-    free(sdata.login_username);
+    state_clean();
     ssh_event_remove_session(event, session);
 }

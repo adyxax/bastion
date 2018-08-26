@@ -14,12 +14,13 @@ static void sigchld_handler(int signo) {
 }
 
 /* SIGINT handler for cleaning up on forced exit. */
-static ssh_bind sshbind;
-static ssh_session session;
+static ssh_bind sshbind = NULL;
+static ssh_session session = NULL;
 
 __attribute__((noreturn)) static void sigint_handler(int signo)
 {
     (void) signo;
+    ssh_disconnect(session);
     ssh_free(session);
     ssh_bind_free(sshbind);
     ssh_finalize();
@@ -75,8 +76,10 @@ int main()
             fprintf(stderr, "Error initializing ssh_session\n");
             break;
         }
+#ifdef LIBSSH_VERBOSE_OUTPOUT
         int verbosity = SSH_LOG_PROTOCOL;
         ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
+#endif
 
         // Blocks until there is a new incoming connection
         if (ssh_bind_accept(sshbind,session) == SSH_OK){
@@ -87,6 +90,7 @@ int main()
                 sigaction(SIGCHLD, &sa, NULL);
                 /* Remove socket binding, which allows us to restart the parent process, without terminating existing sessions. */
                 ssh_bind_free(sshbind);
+                sshbind = NULL;
 
                 ssh_event event = ssh_event_new();
                 if (event != NULL) {

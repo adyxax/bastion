@@ -8,8 +8,7 @@ OBJ=$(sources:.c=.o)
 all: bastion
 
 bastion: $(OBJ)
-	#$(CC) ${DEBUG} -o bastion $(OBJ) -lssh -lutil -lpthread -lssh_threads
-	$(CC) ${DEBUG} -o bastion $(OBJ) -lssh -lutil
+	$(CC) ${DEBUG} -o bastion $(OBJ) -lssh -lutil -ltty
 
 clean:
 	$(RM) bastion *.[do] src/*.[do]

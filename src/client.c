@@ -4,6 +4,10 @@
 
 #include "../config.h"
 #include "client.h"
+#ifdef SESSION_RECORDING
+#include "recording.h"
+#endif
+#include "state.h"
 
 // callback function for channel data and exceptions
 static int client_data_function(ssh_session session, ssh_channel channel, void *data,
@@ -13,9 +17,12 @@ static int client_data_function(ssh_session session, ssh_channel channel, void *
     (void) channel;
     (void) is_stderr;
 
-    if (ssh_channel_is_open(cdata->proxy_channel))
+    if (ssh_channel_is_open(cdata->proxy_channel)) {
+#ifdef SESSION_RECORDING
+        record(data, len);
+#endif
         return ssh_channel_write(cdata->proxy_channel, (char*) data, len);
-    else
+    } else
         return SSH_ERROR;
 }
 
@@ -69,8 +76,9 @@ static void client_channel_exit_signal_callback (ssh_session session, ssh_channe
     printf("client exit signal callback\n");
 }
 
-struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_channel_data_struct *pdata, const char * hostname)
+struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_channel_data_struct *pdata)
 {
+    const char * hostname = state_get_ssh_destination();
     struct client_channel_data_struct *cdata = malloc(sizeof(*cdata));
     cdata->event = event;
     cdata->my_session = NULL;
@@ -90,9 +98,11 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     cdata->my_session = ssh_new();
 
     ssh_options_set(cdata->my_session, SSH_OPTIONS_HOST, hostname);
-    ssh_options_set(cdata->my_session, SSH_OPTIONS_USER, USER_TO_LOGIN_AS);
+    ssh_options_set(cdata->my_session, SSH_OPTIONS_USER, state_get_username());
+#ifdef LIBSSH_VERBOSE_OUTPOUT
     int verbosity = SSH_LOG_PROTOCOL;
     ssh_options_set(cdata->my_session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
+#endif
 
     if (ssh_connect(cdata->my_session) != SSH_OK) {
         printf("Error connecting to %s: %s\n", hostname, ssh_get_error(cdata->my_session));
@@ -152,6 +162,14 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
     ssh_set_channel_callbacks(cdata->my_channel, cdata->client_channel_cb);
     ssh_event_add_session(event, cdata->my_session);
 
+    // TODO only start recording upong shell_exec or pty_request in proxy.c.
+    // It will be important when we start supporting scp
+#ifdef SESSION_RECORDING
+    if (init_recorder() != 0) {
+        goto channel_clean;
+    }
+#endif
+
     ssh_string_free_char(hexa);
     ssh_clean_pubkey_hash(&hash);
     ssh_key_free(server_pub_key);
@@ -179,6 +197,9 @@ privkey_clean:
 
 void client_cleanup(struct client_channel_data_struct *cdata)
 {
+#ifdef SESSION_RECORDING
+    clean_recorder();
+#endif
     ssh_event_remove_session(cdata->event, cdata->my_session);
     ssh_channel_free(cdata->my_channel);
     ssh_disconnect(cdata->my_session);

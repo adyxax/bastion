@@ -11,8 +11,6 @@ struct session_data_struct {
     ssh_channel channel;
     int auth_attempts;
     int authenticated;
-    // ssh user name when login
-    char * login_username;
 };
 
 void handle_session(ssh_event event, ssh_session session);

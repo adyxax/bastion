@@ -16,7 +16,7 @@ struct client_channel_data_struct {
     struct ssh_channel_callbacks_struct * client_channel_cb;
 };
 
-struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_channel_data_struct *pdata, const char * hostname);
+struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_channel_data_struct *pdata);
 void client_cleanup(struct client_channel_data_struct *cdata);
 
 #endif

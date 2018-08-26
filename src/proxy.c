@@ -4,6 +4,7 @@
 
 #include "client.h"
 #include "proxy.h"
+#include "state.h"
 
 // callback function for channel data and exceptions
 static int proxy_data_function(ssh_session session, ssh_channel channel, void *data,
@@ -30,6 +31,7 @@ static int proxy_pty_request(ssh_session session, ssh_channel channel,
     (void) py;
     (void) px;
 
+    // TODO record pty size in recorder
     if (ssh_channel_is_open(pdata->client_channel)) {
         if (ssh_channel_request_pty_size(pdata->client_channel, term, cols, rows) == SSH_OK)
             return SSH_OK;
@@ -51,6 +53,7 @@ static int proxy_pty_resize(ssh_session session, ssh_channel channel, int cols,
     (void) py;
     (void) px;
 
+    // TODO record pty size in recorder
     if (ssh_channel_is_open(pdata->client_channel)) {
         if (ssh_channel_change_pty_size(pdata->client_channel, cols, rows) == SSH_OK)
             return SSH_OK;
@@ -158,7 +161,7 @@ static void proxy_channel_exit_signal_callback (ssh_session session, ssh_channel
     printf("proxy exit signal callback\n");
 }
 
-void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_channel, const char * hostname)
+void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_channel)
 {
     struct client_channel_data_struct * cdata;
 
@@ -169,7 +172,7 @@ void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_c
         .client_channel = NULL,
     };
 
-    cdata = client_dial(event, &pdata, hostname);
+    cdata = client_dial(event, &pdata);
 
     if (cdata == NULL) {
         return;

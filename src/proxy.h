@@ -13,6 +13,6 @@ struct proxy_channel_data_struct {
     ssh_channel my_channel;
     ssh_channel client_channel;
 };
-void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_channel, const char * hostname);
+void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_channel);
 
 #endif
