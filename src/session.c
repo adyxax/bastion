@@ -38,9 +38,9 @@ static int auth_pubkey(ssh_session session, const char *user, ssh_key pubkey, ch
             return SSH_ERROR;
         // TODO check access rights and host configs
         state_set_bastion_username(bastion_username);
+        unsigned long long session_id = db_init_session_and_get_id(user, bastion_username);
+        state_set_session_id(session_id);
         free(bastion_username);
-        // TODO log session creation in db
-        state_set_session_id(1337);
         return SSH_AUTH_SUCCESS;
     } else {
         free(bastion_username);

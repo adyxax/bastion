@@ -155,6 +155,29 @@ void db_set_host_publickey_hash(const char * hostname, const char * hash)
     }
 }
 
+unsigned long long // returns 0 on error, or the session_id
+db_init_session_and_get_id(const char * hostname, const char * username)
+{
+    char buff[255];
+    sprintf(buff, "INSERT INTO sessions (created_at, status, user_id, host_id) SELECT NOW(), \"opened\", users.id, hosts.id from users, hosts WHERE users.name = \"%s\" and hosts.name = \"%s\"", username, hostname);
+    int res = mysql_query(db, buff);
+    if (res != 0) {
+        fprintf(stderr, "FATAL: Couldn't insert new session in database for %s to %s\n", username, hostname);
+        return 0;
+    }
+    unsigned long long id = mysql_insert_id(db);
+    if (id == 0) {
+        fprintf(stderr, "FATAL: Didn't get proper mysql last insert id after inserting new session for %s to %s\n", username, hostname);
+        return 0;
+    }
+    res = mysql_commit(db);
+    if (res != 0) {
+        fprintf(stderr, "FATAL: Couldn't commit after inserting session for %s to %s\n", username, hostname);
+        return 0;
+    }
+    return id;
+}
+
 void db_free_host_info(struct db_host_info * info)
 {
     free(info->privkeytxt);

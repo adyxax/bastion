@@ -6,10 +6,9 @@
 #include "state.h"
 
 struct state {
+    unsigned long long session_id;
     char * destination;
     char * bastion_username;
-    int session_id;
-    int padding; // makes compiler happy
 };
 
 static struct state state = {0};
@@ -59,17 +58,17 @@ const char * state_get_bastion_username(void)
 }
 
 char // return 0 if ok, greater than 0 otherwise
-state_set_session_id(const int id)
+state_set_session_id(const unsigned long long id)
 {
     if (state.session_id != 0) {
-        fprintf(stderr, "BUG found, attempting to overwrite state.username that has already been set\n");
+        fprintf(stderr, "BUG found, attempting to set a state.session_id that has already been set\n");
         return 1;
     }
     state.session_id = id;
     return 0;
 }
 
-int state_get_session_id(void)
+unsigned long long state_get_session_id(void)
 {
     return state.session_id;
 }

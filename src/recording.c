@@ -54,7 +54,7 @@ make_filename(void)
                 strcpy(filename + fname_pos, username);
                 fname_pos += len;
             } else if (format[format_pos] == 'i') {
-                sprintf(filename + fname_pos, "%d", state_get_session_id());
+                sprintf(filename + fname_pos, "%llu", state_get_session_id());
                 fname_pos += strlen(filename + fname_pos);
             }
             format_pos++;
