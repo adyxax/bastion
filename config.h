@@ -9,8 +9,8 @@
 #define RSAKEY_PATH "./ssh_host_rsa_key"
 #define ECDSAKEY_PATH "./ssh_host_ecdsa_key"
 
-#define MYSQL_HOST "::"
-#define MYSQL_USER "root"
+#define MYSQL_HOST "localhost"
+#define MYSQL_USER "sshportal"
 #define MYSQL_PASS "graou"
 #define MYSQL_DB "sshportal"
 

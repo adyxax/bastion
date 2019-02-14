@@ -1,7 +1,6 @@
 bastion
-libssh/
+build
 id_rsa
 ssh_host_*_key
 test_client.c
-*.[do]
 *.sw[a-p]
