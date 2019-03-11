@@ -78,7 +78,7 @@ int main()
             fprintf(stderr, "Error initializing ssh_session\n");
             break;
         }
-#ifdef LIBSSH_VERBOSE_OUTPOUT
+#ifdef LIBSSH_VERBOSE_OUTPUT
         int verbosity = SSH_LOG_PROTOCOL;
         ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
 #endif

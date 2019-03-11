@@ -104,7 +104,7 @@ struct client_channel_data_struct* client_dial(ssh_event event, struct proxy_cha
 
     ssh_options_set(cdata->my_session, SSH_OPTIONS_HOST, info->address);
     ssh_options_set(cdata->my_session, SSH_OPTIONS_USER, info->username);
-#ifdef LIBSSH_VERBOSE_OUTPOUT
+#ifdef LIBSSH_VERBOSE_OUTPUT
     int verbosity = SSH_LOG_PROTOCOL;
     ssh_options_set(cdata->my_session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
 #endif
