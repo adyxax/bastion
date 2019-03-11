@@ -14,3 +14,4 @@ option(SESSION_RECORDING "whether or not recording feature based on lib termrec 
 
 add_subdirectory(bastion)
 add_subdirectory(common)
+add_subdirectory(external)
