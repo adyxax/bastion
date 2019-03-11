@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common/mysql.h"
 #include "client.h"
-#include "mysql.h"
 #include "proxy.h"
 #include "state.h"
 

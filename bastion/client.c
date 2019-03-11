@@ -3,11 +3,11 @@
 #include <stdlib.h>
 
 #include "../config.h"
+#include "common/mysql.h"
 #include "client.h"
 #ifdef SESSION_RECORDING
 #include "recording.h"
 #endif
-#include "mysql.h"
 #include "state.h"
 
 // callback function for channel data and exceptions

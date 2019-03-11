@@ -1,5 +1,5 @@
 include_directories("${bastion_SOURCE_DIR}/termrec/libtty/")
-include_directories("${bastion_SOURCE_DIR}/common")
+include_directories("${bastion_SOURCE_DIR}/")
 
 file(GLOB_RECURSE SOURCES *.c)
 

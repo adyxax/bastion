@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 
 #include "../config.h"
-#include "mysql.h"
+#include "common/mysql.h"
 #include "session.h"
 
 /* SIGCHLD handler for cleaning up dead children. */

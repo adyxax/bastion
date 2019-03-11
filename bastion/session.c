@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 
 #include "../config.h"
-#include "mysql.h"
+#include "common/mysql.h"
 #include "proxy.h"
 #include "session.h"
 #include "state.h"

@@ -1,5 +1,5 @@
-#ifndef MYSQL_H_
-#define MYSQL_H_
+#ifndef COMMON_MYSQL_H_
+#define COMMON_MYSQL_H_
 
 struct db_host_info {
     char * privkeytxt;
