@@ -4,8 +4,9 @@ SSH bastion that features transparent connection and session recording.
 
 This project is inspired by https://github.com/moul/sshportal. I wrote this implementation to work around the fact that I couldn't get the go ssh lib
 to work properly with non interactive sessions, the bug has been open for a long time and I tend to belive it cannot be fixed
-(https://github.com/moul/sshportal/issues/55). This one does work properly with non interactive sessions, which allows transparent ansible usage through
-the bastion.
+(https://github.com/moul/sshportal/issues/55).
+
+This bastion project does work properly with non interactive sessions, which allows transparent ansible usage through the bastion.
 
 ## Contents
 
@@ -39,10 +40,14 @@ make install
 ```
 
 You can customise the build with the following cmake flags :
-- SESSION_RECORDING
 
-For exemple this disables session recording :
-`cmake .. -DSESSION_RECORDING=OFF`
+- `CMAKE_BUILD_TYPE` : Debug|Release|RelWithDebInfo|MinSizeRel, defaults to Release
+- `CMAKE_INSTALL_PREFIX` : path, defaults to `/usr/local`
+- `SESSION_RECORDING` : ON|OFF, defaults to ON
+
+For exemple this disables session recording for a debug build and install it under /usr :
+
+`cmake .. -DCMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=/usr -DSESSION_RECORDING=OFF`
 
 ## Usage
 
