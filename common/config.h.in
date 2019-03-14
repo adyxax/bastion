@@ -1,21 +1,35 @@
 #ifndef COMMON_CONFIG_H_
 #define COMMON_CONFIG_H_
 
-#define LISTEN_PORT 2222
+#define CONFIG_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/bastion.conf"
+
 #define MAX_HOSTNAME_LENGTH 64
 #define MAX_USERNAME_LENGTH 64
 
-#define DSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/ssh_host_dsa_key"
-#define RSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/ssh_host_rsa_key"
-#define ECDSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/ssh_host_ecdsa_key"
+#define DEFAULT_PORT 2222
+#define DEFAULT_DSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_dsa_key"
+#define DEFAULT_RSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_rsa_key"
+#define DEFAULT_ECDSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_ecdsa_key"
 
 #define MYSQL_HOST "localhost"
 #define MYSQL_USER "sshportal"
 #define MYSQL_PASS "graou"
 #define MYSQL_DB "sshportal"
 
-#define LOG_FILENAME_FORMAT "@CMAKE_INSTALL_PREFIX@/var/log/$d/$h/$u/$i.gz" // $d : date in iso format, $h : hostname, $u : username : $i session id
-#define LOG_FILENAME_MAX_LEN 255
-#define LOG_DIRECTORY_MODE S_IRUSR | S_IWUSR | S_IXUSR
+#ifdef SESSION_RECORDING
+#define DEFAULT_SESSION_RECORDING_PATH "@CMAKE_INSTALL_PREFIX@/var/log/bastion/$d/$h/$u/$i.gz"
+#define SESSION_RECORDING_FILENAME_MAX_LEN 255
+#define SESSION_RECORDING_DIRECTORY_MODE S_IRUSR | S_IWUSR | S_IXUSR
+#endif
+
+char config_load(void);
+int config_get_port(void);
+const char * config_get_key_dsa(void);
+const char * config_get_key_rsa(void);
+const char * config_get_key_ecdsa(void);
+#ifdef SESSION_RECORDING
+const char * config_get_session_recording_path(void);
+#endif
+void config_clean(void);
 
 #endif

@@ -50,6 +50,10 @@ int main()
         return 1;
     }
 
+    // Initializing configuration context
+    if (config_load() != 0)
+        fprintf(stderr, "Failed to load configuration file %s, using built-in defaults.\n", CONFIG_PATH);
+
     // Initializing ssh context
     ssh_init();
 
@@ -57,19 +61,21 @@ int main()
     sshbind = ssh_bind_new();
     if (sshbind == NULL) {
         fprintf(stderr, "Error initializing ssh_bind\n");
-        exit(-1);
+        config_clean();
+        return 3;
     }
-    int listen_port = LISTEN_PORT;
+    int listen_port = config_get_port();
     ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT, &listen_port);
-    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_DSAKEY, DSAKEY_PATH);
-    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_RSAKEY, RSAKEY_PATH);
-    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_ECDSAKEY, ECDSAKEY_PATH);
+    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_DSAKEY, config_get_key_dsa());
+    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_RSAKEY, config_get_key_rsa());
+    ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_ECDSAKEY, config_get_key_ecdsa());
 
     if (ssh_bind_listen(sshbind) < 0) {
         printf("Error listening to socket: %s\n", ssh_get_error(sshbind));
         ssh_bind_free(sshbind);
         ssh_finalize();
-        return 1;
+        config_clean();
+        return 4;
     }
 
     while (1) {
@@ -109,6 +115,7 @@ child_cleaning:
                 ssh_disconnect(session);
                 ssh_free(session);
                 ssh_finalize();
+                config_clean();
 
                 return 0;
               case -1:
@@ -120,7 +127,8 @@ child_cleaning:
             ssh_free(session);
             ssh_bind_free(sshbind);
             ssh_finalize();
-            return 1;
+            config_clean();
+            return 5;
         }
         /* Since the session has been passed to a child fork, do some cleaning up at the parent process. */
         ssh_disconnect(session);
@@ -128,6 +136,7 @@ child_cleaning:
     }
     ssh_bind_free(sshbind);
     ssh_finalize();
+    config_clean();
     db_clean();
     return 0;
 }

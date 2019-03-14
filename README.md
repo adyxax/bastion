@@ -11,7 +11,8 @@ This bastion project does work properly with non interactive sessions, which all
 ## Contents
 
 - [Dependencies](#dependencies)
-- [Installation and usage](#manual-installation)
+- [Manual installation](#manual-installation)
+- [Configuration](#configuration)
 - [Usage](#usage)
 - [Docker](#docker)
 - [Monitoring](#monitoring)
@@ -20,7 +21,8 @@ This bastion project does work properly with non interactive sessions, which all
 
 ## Dependencies
 
-This project has only one hard dependency :
+This project has only two hard dependencies :
+- the libconfig from http://www.hyperrealm.com/libconfig/libconfig.html
 - the libssh from https://www.libssh.org/. You should be able to use your distro's packages if they are recent enough.
 
 The following are optional dependencies :
@@ -48,6 +50,25 @@ You can customise the build with the following cmake flags :
 For exemple this disables session recording for a debug build and installs the bastion for your current user :
 
 `cmake .. -DCMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=$HOME/.local -DSESSION_RECORDING=OFF`
+
+## Configuration
+
+Here is the default configuration :
+```
+port = 2222;
+
+keys:
+{
+    dsa = "/home/julien/.local/etc/bastion/ssh_host_dsa_key";
+    rsa = "/home/julien/.local/etc/bastion/ssh_host_rsa_key";
+    ecdsa = "/home/julien/.local/etc/bastion/ssh_host_ecdsa_key";
+};
+
+session_recording:
+{
+    path = "/home/julien/.local/var/log/bastion/$d/$h/$u/$i.gz";     # $d : date in iso format, $h : hostname, $u : username : $i session id
+};
+```
 
 ## Usage
 

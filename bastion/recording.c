@@ -26,15 +26,15 @@ void clean_recorder(void)
 static char * // returns NULL if error, this char * is to be freed from the calling code
 make_filename(void)
 {
-    char * format = LOG_FILENAME_FORMAT;
+    const char * format = config_get_session_recording_path();
     char * filename = NULL;
     unsigned int fname_pos = 0;
     unsigned int format_pos = 0;
 
-    filename = malloc(LOG_FILENAME_MAX_LEN+1);
+    filename = malloc(SESSION_RECORDING_FILENAME_MAX_LEN+1);
 
     size_t format_len = strlen(format);
-    while (format_pos < format_len + 1 && fname_pos < LOG_FILENAME_MAX_LEN +1) {
+    while (format_pos < format_len + 1 && fname_pos < SESSION_RECORDING_FILENAME_MAX_LEN +1) {
         if (format[format_pos] == '$') {
             format_pos++;
             if (format[format_pos] == 'd') {
@@ -42,7 +42,7 @@ make_filename(void)
                 struct tm * tm;
                 time(&t);
                 tm = localtime(&t);
-                fname_pos += strftime(filename + fname_pos, LOG_FILENAME_MAX_LEN - fname_pos, "%F", tm);
+                fname_pos += strftime(filename + fname_pos, SESSION_RECORDING_FILENAME_MAX_LEN - fname_pos, "%F", tm);
             } else if (format[format_pos] == 'h') {
                 const char * hostname = state_get_ssh_destination();
                 size_t len = strlen(hostname);
@@ -66,7 +66,7 @@ make_filename(void)
                 if (dir)
                     closedir(dir);
                 else {
-                    int ret = mkdir(filename, LOG_DIRECTORY_MODE);
+                    int ret = mkdir(filename, SESSION_RECORDING_DIRECTORY_MODE);
                     if (ret != 0) {
                         fprintf(stderr, "Couldn't create log directory %s : %s\n", filename, strerror( errno ));
                     }
@@ -78,7 +78,7 @@ make_filename(void)
     }
 
     if (filename[fname_pos-1] != '\0') {
-        fprintf(stderr, "Log file name is too long, check LOG_FILENAME_FORMAT and LOG_FILENAME_MAX_LEN\n");
+        fprintf(stderr, "Log file name is too long, check the log filename in the configuration file at %s. Alternatively you can change SESSION_RECORDING_FILENAME_MAX_LEN (current value is %d) in the sources and recompile bastion.\n", CONFIG_PATH, SESSION_RECORDING_FILENAME_MAX_LEN);
         free(filename);
         filename = NULL;
     }

@@ -8,6 +8,9 @@ target_link_libraries(bastion common)
 if (${SESSION_RECORDING})
     target_link_libraries(bastion libtty)
 endif()
-target_link_libraries(bastion bz2 lzma mysqlclient ssh z)
+target_link_libraries(bastion bz2 config lzma mysqlclient ssh z)
 
-install (TARGETS bastion DESTINATION bin)
+install(TARGETS bastion DESTINATION bin)
+
+configure_file("bastion.conf.example.in" "bastion.conf.example")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bastion.conf.example" DESTINATION etc/bastion)
