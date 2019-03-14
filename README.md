@@ -41,7 +41,7 @@ make install
 
 You can customise the build with the following cmake flags :
 
-- `CMAKE_BUILD_TYPE` : Debug|Release|RelWithDebInfo|MinSizeRel, defaults to Release
+- `CMAKE_BUILD_TYPE` : Debug|Release|RelWithDebInfo|MinSizeRel, defaults to Release if using a tarball, and Debug if using the git tree
 - `CMAKE_INSTALL_PREFIX` : path, defaults to `/usr/local`
 - `SESSION_RECORDING` : ON|OFF, defaults to ON
 

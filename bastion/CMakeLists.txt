@@ -9,3 +9,5 @@ if (${SESSION_RECORDING})
     target_link_libraries(bastion libtty)
 endif()
 target_link_libraries(bastion bz2 lzma mysqlclient ssh z)
+
+install (TARGETS bastion DESTINATION bin)
