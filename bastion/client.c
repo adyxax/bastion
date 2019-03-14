@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../config.h"
+#include "common/config.h"
 #include "common/mysql.h"
 #include "client.h"
 #ifdef SESSION_RECORDING

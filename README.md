@@ -25,7 +25,7 @@ This project has only one hard dependency :
 
 The following are optional dependencies :
 - the libtty from https://github.com/kilobyte/termrec which allows session recording.
-- compression libraries like libbz2, liblzma, libz allows to compress on the fly session records.
+- compression libraries like libbz2, liblzma, libz allow on the fly compression of session records.
 - libmysql for now because it hosts the runtime config
 
 ## Manual Installation
@@ -45,9 +45,9 @@ You can customise the build with the following cmake flags :
 - `CMAKE_INSTALL_PREFIX` : path, defaults to `/usr/local`
 - `SESSION_RECORDING` : ON|OFF, defaults to ON
 
-For exemple this disables session recording for a debug build and install it under /usr :
+For exemple this disables session recording for a debug build and installs the bastion for your current user :
 
-`cmake .. -DCMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=/usr -DSESSION_RECORDING=OFF`
+`cmake .. -DCMAKE_BUILD_TYPE=Debug -D CMAKE_INSTALL_PREFIX=$HOME/.local -DSESSION_RECORDING=OFF`
 
 ## Usage
 

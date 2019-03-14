@@ -8,7 +8,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include "../config.h"
+#include "common/config.h"
 #include "common/mysql.h"
 #include "proxy.h"
 #include "session.h"

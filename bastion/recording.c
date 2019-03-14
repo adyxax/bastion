@@ -10,7 +10,7 @@
 #include <time.h>
 #include <ttyrec.h>
 
-#include "../config.h"
+#include "common/config.h"
 #include "recording.h"
 #include "state.h"
 
