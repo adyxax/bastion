@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "common/mysql.h"
 #include "client.h"
 #include "proxy.h"
 #include "state.h"
@@ -202,8 +201,8 @@ void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_c
     ssh_callbacks_init(&channel_cb);
     ssh_set_channel_callbacks(my_channel, &channel_cb);
 
-    db_clean(); // we close the mysql connection before the main loop, as to not waste ressources
-
+    // TODO gather what is required from data and config so that we can free
+    // those and not waste resources
     do {
         /* Poll the main event which takes care of the sessions and channels */
         if (ssh_event_dopoll(event, -1) == SSH_ERROR) {

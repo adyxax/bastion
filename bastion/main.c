@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 
 #include "common/config.h"
-#include "common/mysql.h"
 #include "session.h"
 #include "state.h"
 
@@ -28,7 +27,6 @@ __attribute__((noreturn)) static void sigint_handler(int signo)
     state_clean();
     config_clean();
     ssh_finalize();
-    db_clean();
     exit(0);
 }
 
@@ -145,6 +143,5 @@ int main()
     ssh_bind_free(sshbind);
     config_clean();
     ssh_finalize();
-    db_clean();
     return 0;
 }

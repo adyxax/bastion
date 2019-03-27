@@ -8,7 +8,7 @@
 struct state {
     unsigned long long session_id;
     char * destination;
-    char * bastion_username;
+    const char * bastion_username;
 };
 
 static struct state state = {0};
@@ -26,7 +26,7 @@ state_set_ssh_destination(const char * name)
         return 2;
     }
     state.destination = malloc(len+1);
-    strncpy(state.destination, name, len+1);
+    strcpy(state.destination, name);
     return 0;
 }
 
@@ -42,13 +42,7 @@ state_set_bastion_username(const char * name)
         fprintf(stderr, "BUG found, attempting to overwrite state.bastion_username that has already been set\n");
         return 1;
     }
-    size_t len = strnlen(name, MAX_USERNAME_LENGTH + 1);
-    if (len >= MAX_USERNAME_LENGTH + 1) {
-        fprintf(stderr, "Username too long, max length is %d.\n", MAX_USERNAME_LENGTH);
-        return 1;
-    }
-    state.bastion_username = malloc(len+1);
-    strncpy(state.bastion_username, name, len+1);
+    state.bastion_username = name;
     return 0;
 }
 

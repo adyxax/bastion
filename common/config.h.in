@@ -5,17 +5,11 @@
 #define CONFIG_PATH CONFIG_DIR "bastion.conf"
 
 #define MAX_HOSTNAME_LENGTH 64
-#define MAX_USERNAME_LENGTH 64
 
 #define DEFAULT_PORT 2222
 #define DEFAULT_DSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_dsa_key"
 #define DEFAULT_RSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_rsa_key"
 #define DEFAULT_ECDSAKEY_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/ssh_host_ecdsa_key"
-
-#define MYSQL_HOST "localhost"
-#define MYSQL_USER "sshportal"
-#define MYSQL_PASS "graou"
-#define MYSQL_DB "sshportal"
 
 #ifdef SESSION_RECORDING
 #define DEFAULT_SESSION_RECORDING_PATH "@CMAKE_INSTALL_PREFIX@/var/log/bastion/$d/$h/$u/$i.gz"

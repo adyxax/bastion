@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "data_for_config.h"
 
 config_t * config = NULL;
 
@@ -26,7 +27,7 @@ config_load(void)
         fprintf(stderr, "Configuration read error occured at %s:%d %s\n", config_error_file(config), config_error_line(config), config_error_text(config));
         return 1;
     }
-    return 0;
+    return data_init(config);
 }
 
 int config_get_port(void)
@@ -79,6 +80,7 @@ const char * config_get_session_recording_path(void)
 void config_clean(void)
 {
     if (config != NULL) {
+        data_clean();
         config_destroy(config);
         free(config);
         config = NULL;

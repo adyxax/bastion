@@ -9,7 +9,7 @@
 #include <sys/wait.h>
 
 #include "common/config.h"
-#include "common/mysql.h"
+#include "common/data.h"
 #include "proxy.h"
 #include "session.h"
 #include "state.h"
@@ -31,19 +31,19 @@ static int auth_pubkey(ssh_session session, const char *user, ssh_key pubkey, ch
 
     // TODO check for an invite
 
-    char * bastion_username = db_get_username_from_pubkey(pubkey);
+    const char * bastion_username = data_get_username_from_pubkey(pubkey);
     if (bastion_username != NULL) {
         sdata->authenticated = 1;
         if (state_set_ssh_destination(user) != 0)
             return SSH_ERROR;
         // TODO check access rights and host configs
         state_set_bastion_username(bastion_username);
-        unsigned long long session_id = db_init_session_and_get_id(user, bastion_username);
-        state_set_session_id(session_id);
-        free(bastion_username);
+        //TODO Find out how to keep session id in a spool or something - probably with the state.c and state.h stuff
+        //unsigned long long session_id = data_init_session_and_get_id(user, bastion_username);
+        //state_set_session_id(session_id);
+        state_set_session_id(0);
         return SSH_AUTH_SUCCESS;
     } else {
-        free(bastion_username);
         sdata->auth_attempts++;
         return SSH_AUTH_DENIED;
     }

@@ -1,6 +1,3 @@
-bastion
 build
-id_rsa
-ssh_host_*_key
-test_client.c
+stuff
 *.sw[a-p]

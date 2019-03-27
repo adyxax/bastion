@@ -29,7 +29,6 @@ This project has only two hard dependencies :
 The following are optional dependencies :
 - the libtty from https://github.com/kilobyte/termrec which allows session recording.
 - compression libraries like libbz2, liblzma, libz allow on the fly compression of session records.
-- libmysql for now because it hosts the runtime config
 
 ## Manual Installation
 
