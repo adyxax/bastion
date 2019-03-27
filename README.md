@@ -18,6 +18,7 @@ This bastion project does work properly with non interactive sessions, which all
 - [Monitoring](#monitoring)
 - [Backup](#backup)
 - [Scaling](#scaling)
+- [Special thanks](#special-thanks)
 
 ## Dependencies
 
@@ -34,6 +35,7 @@ The following are optional dependencies :
 
 This project is built using cmake :
 ```
+git submodule update --init
 mkdir build
 cd build
 cmake ..
@@ -79,3 +81,12 @@ session_recording:
 ## Backup
 
 ## Scaling
+
+## Special thanks
+
+I would like to thank the developers of the following projects, I am merely standing on the shoulders of giants :
+
+- libconfig from http://www.hyperrealm.com/libconfig/libconfig.html
+- libssh from https://www.libssh.org/
+- libtty from https://github.com/kilobyte/termrec
+- uthash from http://troydhanson.github.io/uthash/

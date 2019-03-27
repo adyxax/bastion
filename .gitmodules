@@ -1,3 +1,6 @@
 [submodule "external/termrec"]
 	path = external/termrec
 	url = https://github.com/kilobyte/termrec
+[submodule "external/uthash"]
+	path = external/uthash
+	url = https://github.com/troydhanson/uthash
