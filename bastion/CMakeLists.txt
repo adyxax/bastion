@@ -1,5 +1,4 @@
-include_directories("${bastion_SOURCE_DIR}/external/termrec/libtty")
-include_directories("${bastion_SOURCE_DIR}/")
+include_directories("${PROJECT_SOURCE_DIR}/external/termrec/libtty")
 
 file(GLOB_RECURSE SOURCES *.c)
 
@@ -14,3 +13,4 @@ install(TARGETS bastion DESTINATION bin)
 
 configure_file("bastion.conf.example.in" "bastion.conf.example")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/bastion.conf.example" DESTINATION etc/bastion)
+install(DIRECTORY DESTINATION var/log/bastion)

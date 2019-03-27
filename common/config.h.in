@@ -1,7 +1,8 @@
 #ifndef COMMON_CONFIG_H_
 #define COMMON_CONFIG_H_
 
-#define CONFIG_PATH "@CMAKE_INSTALL_PREFIX@/etc/bastion/bastion.conf"
+#define CONFIG_DIR "@CMAKE_INSTALL_PREFIX@/etc/bastion/"
+#define CONFIG_PATH CONFIG_DIR "bastion.conf"
 
 #define MAX_HOSTNAME_LENGTH 64
 #define MAX_USERNAME_LENGTH 64

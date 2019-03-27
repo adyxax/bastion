@@ -106,13 +106,16 @@ void handle_session(ssh_event event, ssh_session session) {
     handle_proxy_session(event, session, sdata.channel);
 
     if (ssh_channel_is_open(sdata.channel)) {
+        ssh_channel_send_eof(sdata.channel);
         ssh_channel_close(sdata.channel);
     }
 
     /* Wait up to 5 seconds for the client to terminate the session. */
     for (int n = 0; n < 50 && (ssh_get_status(session) & SESSION_END) == 0; n++) {
-        ssh_event_dopoll(event, 100);
+        if (ssh_event_dopoll(event, 100) == SSH_ERROR)
+            break;
     }
     state_clean();
+    ssh_channel_free(sdata.channel);
     ssh_event_remove_session(event, session);
 }

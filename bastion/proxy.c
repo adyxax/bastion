@@ -210,10 +210,10 @@ void handle_proxy_session(ssh_event event, ssh_session session, ssh_channel my_c
             break;
         }
     } while(ssh_channel_is_open(my_channel) && ssh_channel_is_open(pdata.client_channel));
-    if (ssh_channel_is_open(my_channel))
-        ssh_channel_close(my_channel);
     if (ssh_channel_is_open(cdata->my_channel))
         ssh_channel_close(cdata->my_channel);
+    if (ssh_channel_is_open(my_channel))
+        ssh_channel_close(my_channel);
 
     client_cleanup(cdata);
 }

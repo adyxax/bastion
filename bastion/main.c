@@ -7,6 +7,7 @@
 #include "common/config.h"
 #include "common/mysql.h"
 #include "session.h"
+#include "state.h"
 
 /* SIGCHLD handler for cleaning up dead children. */
 static void sigchld_handler(int signo) {
@@ -24,6 +25,8 @@ __attribute__((noreturn)) static void sigint_handler(int signo)
     ssh_disconnect(session);
     ssh_free(session);
     ssh_bind_free(sshbind);
+    state_clean();
+    config_clean();
     ssh_finalize();
     db_clean();
     exit(0);
@@ -47,22 +50,30 @@ int main()
     sa2.sa_flags = 0;
     if (sigaction(SIGINT, &sa2, NULL) != 0) {
         fprintf(stderr, "Failed to register SIGINT handler\n");
-        return 1;
+        return 2;
     }
 
-    // Initializing configuration context
-    if (config_load() != 0)
-        fprintf(stderr, "Failed to load configuration file %s, using built-in defaults.\n", CONFIG_PATH);
-
     // Initializing ssh context
-    ssh_init();
+    if (ssh_init() != 0) {
+        fprintf(stderr, "Failed to initialize libssh global cryptographic data structures.\n");
+        return 3;
+    };
+
+    // Initializing configuration context
+    if (config_load() != 0) {
+        fprintf(stderr, "Failed to load configuration file %s.\n", CONFIG_PATH);
+        config_clean();
+        ssh_finalize();
+        return 4;
+    }
 
     // Initializing ssh_bind
     sshbind = ssh_bind_new();
     if (sshbind == NULL) {
         fprintf(stderr, "Error initializing ssh_bind\n");
         config_clean();
-        return 3;
+        ssh_finalize();
+        return 5;
     }
     int listen_port = config_get_port();
     ssh_bind_options_set(sshbind, SSH_BIND_OPTIONS_BINDPORT, &listen_port);
@@ -73,9 +84,9 @@ int main()
     if (ssh_bind_listen(sshbind) < 0) {
         printf("Error listening to socket: %s\n", ssh_get_error(sshbind));
         ssh_bind_free(sshbind);
-        ssh_finalize();
         config_clean();
-        return 4;
+        ssh_finalize();
+        return 6;
     }
 
     while (1) {
@@ -100,9 +111,6 @@ int main()
                 ssh_bind_free(sshbind);
                 sshbind = NULL;
 
-                if (db_init() !=0)
-                    goto child_cleaning;
-
                 ssh_event event = ssh_event_new();
                 if (event != NULL) {
                     /* Blocks until the SSH session ends */
@@ -111,11 +119,11 @@ int main()
                 } else {
                     fprintf(stderr, "Could not create polling context\n");
                 }
-child_cleaning:
+
                 ssh_disconnect(session);
                 ssh_free(session);
-                ssh_finalize();
                 config_clean();
+                ssh_finalize();
 
                 return 0;
               case -1:
@@ -126,17 +134,17 @@ child_cleaning:
             ssh_disconnect(session);
             ssh_free(session);
             ssh_bind_free(sshbind);
-            ssh_finalize();
             config_clean();
-            return 5;
+            ssh_finalize();
+            return 7;
         }
         /* Since the session has been passed to a child fork, do some cleaning up at the parent process. */
         ssh_disconnect(session);
         ssh_free(session);
     }
     ssh_bind_free(sshbind);
-    ssh_finalize();
     config_clean();
+    ssh_finalize();
     db_clean();
     return 0;
 }
