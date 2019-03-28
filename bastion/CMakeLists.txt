@@ -4,10 +4,10 @@ file(GLOB_RECURSE SOURCES *.c)
 
 add_executable(bastion ${SOURCES})
 target_link_libraries(bastion common)
-if (${SESSION_RECORDING})
+if (SESSION_RECORDING)
     target_link_libraries(bastion libtty)
 endif()
-target_link_libraries(bastion bz2 config lzma ssh z)
+target_link_libraries(bastion bz2 config curl lzma ssh z)
 
 install(TARGETS bastion DESTINATION bin)
 

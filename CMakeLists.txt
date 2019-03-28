@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(bastion LANGUAGES C VERSION 0.1.1)
+project(bastion LANGUAGES C VERSION 0.1.2)
 
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -21,6 +21,10 @@ set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -pg")
 
 option(LIBSSH_VERBOSE_OUTPUT "whether or not verbose output for libssh mode is activated" OFF)
 option(SESSION_RECORDING "whether or not recording feature based on lib termrec is activated" ON)
+
+if(SESSION_RECORDING)
+    add_definitions(-DSESSION_RECORDING)
+endif()
 
 configure_file("common/config.h.in" "common/config.h")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
