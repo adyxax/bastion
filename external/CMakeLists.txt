@@ -34,3 +34,6 @@ if (SESSION_RECORDING)
     target_link_libraries(termplay bz2 curl lzma pthread z)
     install(TARGETS termplay DESTINATION bin)
 endif()
+
+# Build parg library for argument parsing
+add_library(libparg parg/parg.c parg/parg.h)

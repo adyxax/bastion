@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(bastion LANGUAGES C VERSION 0.1.2)
+project(bastion LANGUAGES C VERSION 0.1.3)
 
 set(CMAKE_VERBOSE_MAKEFILE FALSE)
 if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
@@ -26,6 +26,8 @@ if(SESSION_RECORDING)
     add_definitions(-DSESSION_RECORDING)
 endif()
 
+execute_process(COMMAND git rev-parse HEAD RESULT_VARIABLE GIT_HASH_RESULT OUTPUT_VARIABLE GIT_HASH_FULL)
+string(STRIP ${GIT_HASH_FULL} GIT_HASH)
 configure_file("common/config.h.in" "common/config.h")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")

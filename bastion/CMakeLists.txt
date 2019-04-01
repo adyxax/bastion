@@ -1,3 +1,4 @@
+include_directories("${PROJECT_SOURCE_DIR}/external/parg/")
 include_directories("${PROJECT_SOURCE_DIR}/external/termrec/libtty")
 
 file(GLOB_RECURSE SOURCES *.c)
@@ -7,7 +8,8 @@ target_link_libraries(bastion common)
 if (SESSION_RECORDING)
     target_link_libraries(bastion libtty)
 endif()
-target_link_libraries(bastion bz2 config curl lzma ssh z)
+target_link_libraries(bastion libparg)
+target_link_libraries(bastion bz2 config curl lzma pthread ssh z)
 
 install(TARGETS bastion DESTINATION bin)
 

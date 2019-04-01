@@ -7,12 +7,12 @@
 config_t * config = NULL;
 
 char // returns 0 if ok, greater than 0 otherwise
-config_load(void)
+config_load(const char *config_file)
 {
     config = malloc(sizeof(config_t));
     config_init(config);
     config_set_tab_width(config, 4);
-    if (config_read_file(config, CONFIG_PATH) != CONFIG_TRUE) {
+    if (config_read_file(config, config_file) != CONFIG_TRUE) {
         switch(config_error_type(config)) {
           case CONFIG_ERR_NONE:
             fprintf(stderr, "Configuration read error with none type reported... This shouldn't happen!\n");

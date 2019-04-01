@@ -3,6 +3,8 @@
 
 #define CONFIG_DIR "@CMAKE_INSTALL_PREFIX@/etc/bastion/"
 #define CONFIG_PATH CONFIG_DIR "bastion.conf"
+#define VERSION "@PROJECT_VERSION@"
+#define GIT_HASH "@GIT_HASH@"
 
 #define MAX_HOSTNAME_LENGTH 64
 
@@ -17,7 +19,7 @@
 #define SESSION_RECORDING_DIRECTORY_MODE S_IRUSR | S_IWUSR | S_IXUSR
 #endif
 
-char config_load(void);
+char config_load(const char *config_file);
 int config_get_port(void);
 const char * config_get_key_dsa(void);
 const char * config_get_key_rsa(void);
