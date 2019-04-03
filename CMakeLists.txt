@@ -17,7 +17,7 @@ set(CMAKE_C_FLAGS "-Wall -Werror -Wextra -pedantic")
 set(CMAKE_C_FLAGS_DEBUG "-O0 -ggdb3 -pg -fsanitize=address")
 set(CMAKE_C_FLAGS_RELEASE "-O2")
 set(CMAKE_C_FLAGS_MinSizeRel "-Os")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -pg")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O0 -ggdb3 -pg")
 
 option(LIBSSH_VERBOSE_OUTPUT "whether or not verbose output for libssh mode is activated" OFF)
 option(SESSION_RECORDING "whether or not recording feature based on lib termrec is activated" ON)
