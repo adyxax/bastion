@@ -14,7 +14,9 @@ This bastion project does work properly with non interactive sessions, which all
 - [Manual installation](#manual-installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
+- [Session recording](#session-recording)
 - [Docker](#docker)
+- [Log management](#log-management)
 - [Monitoring](#monitoring)
 - [Backup](#backup)
 - [Scaling](#scaling)
@@ -73,7 +75,21 @@ session_recording:
 
 ## Usage
 
+```
+julien@hurricane ~/git/bastion/build (master *$%) $ bastion -h
+Usage: bastion [-h] [-v] [-t] [-f] [-c STRING]
+  -h : show this help message and exit
+  -v : show version and exit
+  -t : test configuration file and exit
+  -f : stay in foreground (don't fork)
+  -c : specify a path to a configuration file to use instead of the default /home/julien/.local/etc/bastion/bastion.conf
+```
+
+## Session recording
+
 ## Docker
+
+## Log management
 
 ## Monitoring
 
